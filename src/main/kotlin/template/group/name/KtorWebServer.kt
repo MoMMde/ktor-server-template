@@ -11,6 +11,7 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.util.*
+import io.ktor.util.logging.*
 import kotlinx.serialization.json.Json
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
@@ -21,7 +22,6 @@ import org.koin.core.logger.Level as KoinLevel
 import template.group.name.routing.MiscRouting
 
 private val engine = CIO
-private val ktorLogger = KotlinLogging.logger { }
 private val json = Json {
     prettyPrint = true
     ignoreUnknownKeys = true
@@ -33,7 +33,6 @@ internal fun environment() = applicationEngineEnvironment {
         port = Config.PORT
         host = Config.HOST
     }
-    log = ktorLogger
     developmentMode = Config.DEBUG
 
     module {
@@ -51,7 +50,6 @@ internal fun Application.module() {
 
     install(CallLogging) {
         level = if (Config.DEBUG) Slf4jLevel.DEBUG else Slf4jLevel.INFO
-        logger = ktorLogger.
         format { call ->
             val method = call.request.httpMethod.value
             val path = call.request.path()
